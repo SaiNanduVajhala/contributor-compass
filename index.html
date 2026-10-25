@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contributor Compass - Powered by Gemma 4</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-elevated: #161b22;
+      --bg-card: #1c2128;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79b8ff;
+      --success: #3fb950;
+      --warning: #d29922;
+      --error: #f85149;
+      --font-base: 16px;
+      --radius: 8px;
+      --shadow: 0 4px 12px rgba(0,0,0,0.4);
+      --transition: 0.15s ease;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: var(--font-base); }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button {
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: var(--radius);
+      transition: all var(--transition);
+    }
+    input, textarea, select {
+      font-family: inherit;
+      font-size: 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      padding: 0.75rem;
+      width: 100%;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2);
+    }
+    label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+    .container { max-width: 960px; margin: 0 auto; padding: 1.5rem; }
+    
+    /* Header */
+    header { margin-bottom: 2rem; text-align: center; }
+    h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; }
+    .tagline { color: var(--text-muted); margin-top: 0.5rem; font-size: 1.1rem; }
+    .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #58a6ff, #a371f7);
+      color: #0d1117;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 0.75rem;
+    }
+    
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .card h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .card h3 { font-size: 1rem; font-weight: 600; margin: 1rem 0 0.5rem; }
+    
+    /* Input Card */
+    .input-row { display: grid; gap: 1rem; margin-bottom: 1rem; }
+    @media (min-width: 600px) { .input-row { grid-template-columns: 1fr 1fr; } }
+    .full-width { grid-column: 1 / -1; }
+    
+    /* Repo input with Issue Radar */
+    .repo-wrapper { position: relative; }
+    .repo-wrapper input { padding-right: 120px; }
+    .btn-secondary {
+      background: var(--bg-elevated);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+    }
+    .btn-secondary:hover { background: var(--border); }
+    .repo-wrapper .btn-secondary { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); padding: 0.5rem 0.75rem; font-size: 0.85rem; }
+    
+    /* Issue textarea */
+    textarea { min-height: 120px; resize: vertical; font-family: inherit; }
+    
+    /* Image drop zone */
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      position: relative;
+    }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(88, 166, 255, 0.05); }
+    .drop-zone.has-image { border-style: solid; padding: 0; }
+    .drop-zone input { display: none; }
+    .drop-zone-content { pointer-events: none; }
+    .drop-zone-preview { max-width: 100%; max-height: 200px; border-radius: var(--radius); display: none; }
+    .drop-zone.has-image .drop-zone-preview { display: block; }
+    .drop-zone.has-image .drop-zone-content { display: none; }
+    .drop-zone-remove {
+      position: absolute; top: 0.5rem; right: 0.5rem;
+      background: var(--error); color: white; border: none;
+      width: 28px; height: 28px; border-radius: 50%;
+      font-size: 1.2rem; line-height: 1; display: none;
+    }
+    .drop-zone.has-image .drop-zone-remove { display: flex; align-items: center; justify-content: center; }
+    
+    /* Selects row */
+    .selects-row { display: grid; gap: 1rem; }
+    @media (min-width: 480px) { .selects-row { grid-template-columns: 1fr 1fr; } }
+    
+    /* Primary button */
+    .btn-primary {
+      background: var(--accent);
+      color: #0d1117;
+      font-weight: 600;
+      padding: 0.875rem 1.5rem;
+      width: 100%;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-primary .spinner { display: none; width: 1em; height: 1em; border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 0.5rem; vertical-align: middle; }
+    .btn-primary.loading .btn-text { display: none; }
+    .btn-primary.loading .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Settings drawer */
+    .settings-link { text-align: right; margin-top: 0.5rem; font-size: 0.9rem; }
+    .settings-drawer {
+      display: none;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+    .settings-drawer.open { display: block; }
+    .settings-drawer input { margin-bottom: 0.5rem; }
+    .settings-drawer small { color: var(--text-muted); font-size: 0.85rem; }
+    
+    /* Trace timeline */
+    .trace-container { max-height: 300px; overflow-y: auto; }
+    .trace-event { padding: 0.5rem 0.75rem; margin: 0.25rem 0; background: var(--bg); border-radius: 6px; font-size: 0.9rem; font-family: ui-monospace, monospace; border-left: 3px solid var(--border); animation: slideIn 0.2s ease; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+    .trace-event.step { border-left-color: var(--accent); }
+    .trace-event.tool { border-left-color: #a371f7; background: rgba(163, 113, 247, 0.08); }
+    .trace-event.result { border-left-color: var(--success); }
+    .trace-event.error { border-left-color: var(--error); background: rgba(248, 81, 73, 0.08); }
+    .trace-event .label { font-weight: 600; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .trace-event .summary { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem; }
+    
+    /* Results */
+    .results-grid { display: grid; gap: 1rem; }
+    @media (min-width: 720px) { .results-grid { grid-template-columns: 1fr 1fr; } }
+    .result-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; }
+    .result-card.full-width { grid-column: 1 / -1; }
+    .result-card h3 { font-size: 0.95rem; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+    
+    /* Verification badge */
+    .verification { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 500; }
+    .verification.verified { background: rgba(63, 185, 80, 0.15); color: var(--success); }
+    .verification.unverified { background: rgba(248, 81, 73, 0.15); color: var(--error); }
+    .verification.read { background: rgba(88, 166, 255, 0.15); color: var(--accent); }
+    
+    /* File cards */
+    .file-item { padding: 0.75rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 0.5rem; }
+    .file-item:last-child { margin-bottom: 0; }
+    .file-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+    .file-path { font-family: ui-monospace, monospace; font-size: 0.9rem; color: var(--accent); word-break: break-all; }
+    .file-link { font-size: 0.8rem; opacity: 0.7; }
+    .file-explanation { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
+    .file-where { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic; }
+    
+    /* Lists */
+    .step-list, .checklist { list-style: none; }
+    .step-list li, .checklist li { padding: 0.5rem 0.75rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 0.5rem; }
+    .step-list li:last-child, .checklist li:last-child { margin-bottom: 0; }
+    .step-number { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: var(--accent); color: #0d1117; border-radius: 50%; font-size: 0.75rem; font-weight: 600; margin-right: 0.75rem; flex-shrink: 0; }
+    .step-detail { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; margin-left: 2.25rem; }
+    .checklist label { display: flex; align-items: flex-start; gap: 0.5rem; cursor: pointer; }
+    .checklist input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); flex-shrink: 0; margin-top: 2px; }
+    
+    /* Code blocks */
+    pre { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+    code { font-family: ui-monospace, monospace; }
+    
+    /* Copy/Download buttons */
+    .action-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+    .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); padding: 0.5rem 1rem; font-size: 0.9rem; }
+    .btn-ghost:hover { background: var(--bg-elevated); border-color: var(--accent); }
+    .btn-ghost.copied { background: var(--success); border-color: var(--success); color: white; }
+    
+    /* Difficulty meter */
+    .difficulty-meter { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .difficulty-level { font-weight: 600; text-transform: capitalize; }
+    .difficulty-level.easy { color: var(--success); }
+    .difficulty-level.medium { color: var(--warning); }
+    .difficulty-level.hard { color: var(--error); }
+    .confidence-bar { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+    .confidence-fill { height: 100%; border-radius: 4px; transition: width 0.3s ease; }
+    .confidence-fill.high { background: var(--success); }
+    .confidence-fill.med { background: var(--warning); }
+    .confidence-fill.low { background: var(--error); }
+    
+    /* Unknowns */
+    .unknowns-list { list-style: none; }
+    .unknowns-list li { padding: 0.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 0.35rem; font-size: 0.9rem; }
+    
+    /* Footer */
+    footer { text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 2rem 0; }
+    
+    /* Hidden */
+    .hidden { display: none !important; }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Contributor Compass</h1>
+      <p class="tagline">Paste a repo and an issue. In under a minute, know exactly which files to open, what to change, and how to open the PR.</p>
+      <span class="badge">Powered by Gemma 4</span>
+    </header>
+
+    <!-- Input Card -->
+    <div class="card" id="input-card">
+      <h2>New Analysis</h2>
+      
+      <div class="input-row">
+        <div class="repo-wrapper">
+          <label for="repo-input">Repository</label>
+          <input type="text" id="repo-input" placeholder="https://github.com/owner/repo or owner/repo" autocomplete="off">
+          <button type="button" class="btn-secondary" id="issue-radar-btn" title="Fetch good first issues">Issue Radar</button>
+        </div>
+        <div>
+          <label for="level-select">Experience Level</label>
+          <select id="level-select">
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="input-row">
+        <div class="full-width">
+          <label for="issue-input">Issue Description</label>
+          <textarea id="issue-input" placeholder="Describe the issue, bug, or feature request... (optional if you have a screenshot)"></textarea>
+        </div>
+      </div>
+      
+      <div class="input-row">
+        <div class="full-width">
+          <label>Screenshot (optional)</label>
+          <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Drop zone for screenshot">
+            <input type="file" id="image-input" accept="image/png,image/jpeg,image/webp">
+            <div class="drop-zone-content">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--text-muted); margin-bottom: 0.5rem;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <p>Drag & drop a screenshot, click to browse, or press <kbd>Ctrl+V</kbd> to paste</p>
+              <small>PNG, JPEG, WebP • Max 5 MB</small>
+            </div>
+            <img class="drop-zone-preview" id="image-preview" alt="Screenshot preview">
+            <button type="button" class="drop-zone-remove" id="image-remove" aria-label="Remove image">×</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="input-row">
+        <div class="full-width selects-row">
+          <div>
+            <label for="language-select">Explanation Language</label>
+            <select id="language-select">
+              <option value="English">English</option>
+              <option value="Hindi">Hindi</option>
+              <option value="Telugu">Telugu</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <button type="button" class="btn-primary" id="analyze-btn">
+        <span class="spinner"></span>
+        <span class="btn-text">Analyze with Gemma 4</span>
+      </button>
+      
+      <div class="settings-link">
+        <button type="button" class="btn-ghost" id="settings-toggle">Settings</button>
+      </div>
+      <div class="settings-drawer" id="settings-drawer">
+        <label for="token-input">GitHub Personal Access Token (optional)</label>
+        <input type="password" id="token-input" placeholder="ghp_..." autocomplete="off">
+        <small>Increases rate limit from 60 to 5,000 requests/hour. Never saved, never logged. Stored only in session storage for this tab.</small>
+      </div>
+    </div>
+
+    <!-- Trace Timeline -->
+    <div class="card hidden" id="trace-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2>Agent Trace</h2>
+        <span id="trace-count" style="font-size: 0.85rem; color: var(--text-muted);">0 events</span>
+      </div>
+      <div class="trace-container" id="trace-container"></div>
+    </div>
+
+    <!-- Results -->
+    <div class="card hidden" id="results-card">
+      <h2>Contribution Brief</h2>
+      <div class="results-grid" id="results-grid"></div>
+      <div class="action-buttons" id="action-buttons"></div>
+    </div>
+
+    <!-- Error toast -->
+    <div id="toast" class="hidden" style="position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--error); color: white; padding: 1rem 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow); z-index: 1000; animation: slideUp 0.3s ease;"></div>
+  </div>
+
+  <footer>
+    Built for Hacktoberfest Hyderabad 2026 • <a href="https://github.com/google/gemma" target="_blank" rel="noopener">Gemma 4</a> + <a href="https://github.com" target="_blank" rel="noopener">GitHub API</a>
+  </footer>
+
+  <script>
+    // ===== State =====
+    let currentResult = null;
+    let traceEventCount = 0;
+    const toast = document.getElementById('toast');
+    
+    // ===== DOM Elements =====
+    const repoInput = document.getElementById('repo-input');
+    const issueInput = document.getElementById('issue-input');
+    const levelSelect = document.getElementById('level-select');
+    const languageSelect = document.getElementById('language-select');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const issueRadarBtn = document.getElementById('issue-radar-btn');
+    const dropZone = document.getElementById('drop-zone');
+    const imageInput = document.getElementById('image-input');
+    const imagePreview = document.getElementById('image-preview');
+    const imageRemove = document.getElementById('image-remove');
+    const settingsToggle = document.getElementById('settings-toggle');
+    const settingsDrawer = document.getElementById('settings-drawer');
+    const tokenInput = document.getElementById('token-input');
+    const traceCard = document.getElementById('trace-card');
+    const traceContainer = document.getElementById('trace-container');
+    const traceCount = document.getElementById('trace-count');
+    const resultsCard = document.getElementById('results-card');
+    const resultsGrid = document.getElementById('results-grid');
+    const actionButtons = document.getElementById('action-buttons');
+    
+    // ===== Utilities =====
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    function showToast(message, isError = true) {
+      toast.textContent = message;
+      toast.style.background = isError ? 'var(--error)' : 'var(--success)';
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 4000);
+    }
+    
+    function setAnalyzeLoading(loading) {
+      analyzeBtn.disabled = loading;
+      analyzeBtn.classList.toggle('loading', loading);
+    }
+    
+    function addTraceEvent(event) {
+      traceEventCount++;
+      traceCount.textContent = `${traceEventCount} event${traceEventCount !== 1 ? 's' : ''}`;
+      traceCard.classList.remove('hidden');
+      
+      const div = document.createElement('div');
+      div.className = `trace-event ${event.type}`;
+      
+      let html = `<span class="label">${event.type}</span>`;
+      if (event.type === 'step') {
+        html += escapeHtml(event.text);
+      } else if (event.type === 'tool') {
+        html += `<strong>${escapeHtml(event.name)}</strong>(${escapeHtml(JSON.stringify(event.args))})`;
+        if (event.summary) html += `<div class="summary">${escapeHtml(event.summary)}</div>`;
+      } else if (event.type === 'result') {
+        html += 'Analysis complete';
+      } else if (event.type === 'error') {
+        html += escapeHtml(event.text);
+      }
+      div.innerHTML = html;
+      traceContainer.appendChild(div);
+      traceContainer.scrollTop = traceContainer.scrollHeight;
+    }
+    
+    function clearTrace() {
+      traceContainer.innerHTML = '';
+      traceEventCount = 0;
+      traceCount.textContent = '0 events';
+      traceCard.classList.add('hidden');
+    }
+    
+    function clearResults() {
+      resultsGrid.innerHTML = '';
+      actionButtons.innerHTML = '';
+      resultsCard.classList.add('hidden');
+      currentResult = null;
+    }
+    
+    // ===== Image Handling =====
+    function handleImageFile(file) {
+      if (!file) return;
+      if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+        showToast('Invalid image type. Use PNG, JPEG, or WebP.');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('Image too large. Maximum 5 MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        imagePreview.src = e.target.result;
+        dropZone.classList.add('has-image');
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    dropZone.addEventListener('click', () => imageInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length) handleImageFile(e.dataTransfer.files[0]);
+    });
+    imageInput.addEventListener('change', (e) => { if (e.target.files.length) handleImageFile(e.target.files[0]); });
+    imageRemove.addEventListener('click', (e) => {
+      e.stopPropagation();
+      imageInput.value = '';
+      imagePreview.src = '';
+      dropZone.classList.remove('has-image');
+    });
+    
+    // Paste image support
+    document.addEventListener('paste', (e) => {
+      const items = e.clipboardData.items;
+      for (const item of items) {
+        if (item.type.startsWith('image/')) {
+          handleImageFile(item.getAsFile());
+          break;
+        }
+      }
+    });
+    
+    // ===== Settings Drawer =====
+    settingsToggle.addEventListener('click', () => {
+      settingsDrawer.classList.toggle('open');
+    });
+    
+    // Load token from sessionStorage
+    const savedToken = sessionStorage.getItem('github_token');
+    if (savedToken) tokenInput.value = savedToken;
+    tokenInput.addEventListener('input', () => {
+      sessionStorage.setItem('github_token', tokenInput.value);
+    });
+    
+    // ===== Issue Radar =====
+    issueRadarBtn.addEventListener('click', async () => {
+      const repo = repoInput.value.trim();
+      if (!repo) { showToast('Enter a repository first.'); return; }
+      
+      issueRadarBtn.disabled = true;
+      issueRadarBtn.textContent = 'Loading...';
+      
+      try {
+        const token = tokenInput.value.trim() || null;
+        const resp = await fetch('/api/issues', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ repo, token })
+        });
+        const data = await resp.json();
+        issueRadarBtn.disabled = false;
+        issueRadarBtn.textContent = 'Issue Radar';
+        
+        if (data.error) { showToast(data.error); return; }
+        if (!data.issues.length) { showToast('No open issues found.', false); return; }
+        
+        // Show modal to pick issue
+        const modal = document.createElement('div');
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:1000;padding:1rem;';
+        modal.innerHTML = `
+          <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;max-width:600px;width:100%;max-height:80vh;overflow:auto;">
+            <h3 style="margin-bottom:1rem;">Select an Issue (${data.source})</h3>
+            ${data.issues.map((issue, i) => `
+              <button type="button" data-index="${i}" style="width:100%;text-align:left;padding:1rem;margin-bottom:0.5rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);cursor:pointer;display:flex;flex-direction:column;gap:0.25rem;">
+                <span style="font-weight:600;">#${issue.number}: ${escapeHtml(issue.title)}</span>
+                <span style="font-size:0.85rem;color:var(--text-muted);">
+                  ${issue.labels.map(l => `<span style="background:var(--accent);color:#0d1117;padding:0.1rem 0.4rem;border-radius:4px;font-size:0.7rem;margin-right:0.25rem;">${escapeHtml(l)}</span>`).join('')}
+                  ${issue.comments > 0 ? ` • ${issue.comments} comments` : ''}
+                </span>
+              </button>
+            `).join('')}
+            <button type="button" id="modal-close" style="width:100%;margin-top:1rem;padding:0.75rem;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);cursor:pointer;">Cancel</button>
+          </div>
+        `;
+        document.body.appendChild(modal);
+        
+        modal.querySelectorAll('button[data-index]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const issue = data.issues[parseInt(btn.dataset.index)];
+            issueInput.value = `#${issue.number}: ${issue.title}\n\n${issue.body}`;
+            document.body.removeChild(modal);
+          });
+        });
+        modal.querySelector('#modal-close').addEventListener('click', () => document.body.removeChild(modal));
+        modal.addEventListener('click', (e) => { if (e.target === modal) document.body.removeChild(modal); });
+      } catch (err) {
+        issueRadarBtn.disabled = false;
+        issueRadarBtn.textContent = 'Issue Radar';
+        showToast('Failed to fetch issues: ' + err.message);
+      }
+    });
+    
+    // ===== Analyze =====
+    analyzeBtn.addEventListener('click', async () => {
+      const repo = repoInput.value.trim();
+      const issue = issueInput.value.trim();
+      const level = levelSelect.value;
+      const language = languageSelect.value;
+      const token = tokenInput.value.trim() || null;
+      const imageFile = imageInput.files[0];
+      
+      if (!repo) { showToast('Enter a repository link.'); return; }
+      if (!issue && !imageFile) { showToast('Provide an issue description or a screenshot.'); return; }
+      
+      setAnalyzeLoading(true);
+      clearTrace();
+      clearResults();
+      
+      const formData = new FormData();
+      formData.append('repo', repo);
+      if (issue) formData.append('issue', issue);
+      formData.append('level', level);
+      formData.append('language', language);
+      if (token) formData.append('token', token);
+      if (imageFile) formData.append('image', imageFile);
+      
+      try {
+        const resp = await fetch('/api/analyze', { method: 'POST', body: formData });
+        
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            try {
+              const event = JSON.parse(line);
+              addTraceEvent(event);
+              if (event.type === 'result') {
+                currentResult = event.data;
+                renderResults(event.data);
+              } else if (event.type === 'error') {
+                showToast(event.text);
+              }
+            } catch (e) {
+              console.warn('Failed to parse NDJSON line:', line);
+            }
+          }
+        }
+      } catch (err) {
+        showToast('Analysis failed: ' + err.message);
+      } finally {
+        setAnalyzeLoading(false);
+        if (currentResult) {
+          resultsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    });
+    
+    // ===== Render Results =====
+    function renderResults(data) {
+      resultsCard.classList.remove('hidden');
+      resultsGrid.innerHTML = '';
+      actionButtons.innerHTML = '';
+      
+      // Title & Problem Summary
+      const headerCard = document.createElement('div');
+      headerCard.className = 'result-card full-width';
+      headerCard.innerHTML = `
+        <h3>${escapeHtml(data.title || 'Contribution Brief')}</h3>
+        <p style="margin-bottom: 1rem;">${escapeHtml(data.problem_summary || '')}</p>
+        <div class="difficulty-meter">
+          <span class="difficulty-level ${(data.difficulty?.level || '').toLowerCase()}">${data.difficulty?.level || 'Unknown'}</span>
+          <div class="confidence-bar">
+            <div class="confidence-fill ${getConfidenceClass(data.difficulty?.confidence)}" style="width: ${data.difficulty?.confidence || 0}%"></div>
+          </div>
+          <span style="font-size:0.9rem;color:var(--text-muted);">${data.difficulty?.confidence || 0}% confidence</span>
+        </div>
+        <p style="font-size:0.9rem;color:var(--text-muted);margin-top:0.5rem;">${escapeHtml(data.difficulty?.why || '')}</p>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0.5rem;">Estimated time: ${escapeHtml(data.difficulty?.estimated_time || 'Unknown')}</p>
+      `;
+      resultsGrid.appendChild(headerCard);
+      
+      // Files
+      if (data.files?.length) {
+        const filesCard = document.createElement('div');
+        filesCard.className = 'result-card';
+        filesCard.innerHTML = '<h3>Files to Open</h3><div id="files-list"></div>';
+        resultsGrid.appendChild(filesCard);
+        const filesList = filesCard.querySelector('#files-list');
+        data.files.forEach(f => {
+          const verified = f.verified ? 'verified' : 'unverified';
+          const read = f.read_by_agent ? 'read' : '';
+          const badgeHtml = `
+            <span class="verification ${verified}">${verified === 'verified' ? '✓ Verified' : '✗ Not in tree'}</span>
+            ${read ? '<span class="verification read">Read by agent</span>' : ''}
+          `;
+          const div = document.createElement('div');
+          div.className = 'file-item';
+          div.innerHTML = `
+            <div class="file-header">
+              <a class="file-path" href="${escapeHtml(f.url || '#')}" target="_blank" rel="noopener">${escapeHtml(f.path)}</a>
+              ${f.url ? `<a class="file-link" href="${escapeHtml(f.url)}" target="_blank" rel="noopener">View on GitHub →</a>` : ''}
+              ${badgeHtml}
+            </div>
+            <p class="file-explanation">${escapeHtml(f.plain_explanation || f.why_relevant || '')}</p>
+            <p class="file-where">${escapeHtml(f.where_to_look || '')}</p>
+          `;
+          filesList.appendChild(div);
+        });
+      }
+      
+      // Fix Plan
+      if (data.fix_plan?.length) {
+        const planCard = document.createElement('div');
+        planCard.className = 'result-card';
+        let stepsHtml = '<ol class="step-list">';
+        data.fix_plan.forEach((step, i) => {
+          stepsHtml += `<li><span class="step-number">${i+1}</span><strong>${escapeHtml(step.step)}</strong><div class="step-detail">${escapeHtml(step.detail || '')}</div></li>`;
+        });
+        stepsHtml += '</ol>';
+        planCard.innerHTML = `<h3>Fix Plan</h3>${stepsHtml}`;
+        resultsGrid.appendChild(planCard);
+      }
+      
+      // Test Checklist
+      if (data.test_checklist?.length) {
+        const testCard = document.createElement('div');
+        testCard.className = 'result-card';
+        let checksHtml = '<ul class="checklist">';
+        data.test_checklist.forEach(item => {
+          checksHtml += `<li><label><input type="checkbox"> ${escapeHtml(item)}</label></li>`;
+        });
+        checksHtml += '</ul>';
+        testCard.innerHTML = `<h3>Test Checklist</h3>${checksHtml}`;
+        resultsGrid.appendChild(testCard);
+      }
+      
+      // Commit Message
+      if (data.commit_message) {
+        const commitCard = document.createElement('div');
+        commitCard.className = 'result-card full-width';
+        commitCard.innerHTML = `
+          <h3>Commit Message</h3>
+          <pre id="commit-msg">${escapeHtml(data.commit_message)}</pre>
+          <button type="button" class="btn-ghost" data-copy="commit-msg">Copy</button>
+        `;
+        resultsGrid.appendChild(commitCard);
+      }
+      
+      // PR Description
+      if (data.pr_description) {
+        const prCard = document.createElement('div');
+        prCard.className = 'result-card full-width';
+        prCard.innerHTML = `
+          <h3>PR Description</h3>
+          <pre id="pr-desc">${escapeHtml(data.pr_description)}</pre>
+          <button type="button" class="btn-ghost" data-copy="pr-desc">Copy</button>
+        `;
+        resultsGrid.appendChild(prCard);
+      }
+      
+      // Maintainer Comment
+      if (data.maintainer_comment) {
+        const maintCard = document.createElement('div');
+        maintCard.className = 'result-card full-width';
+        maintCard.innerHTML = `
+          <h3>Maintainer Comment</h3>
+          <pre id="maint-comment">${escapeHtml(data.maintainer_comment)}</pre>
+          <button type="button" class="btn-ghost" data-copy="maint-comment">Copy</button>
+        `;
+        resultsGrid.appendChild(maintCard);
+      }
+      
+      // Unknowns
+      if (data.unknowns?.length) {
+        const unkCard = document.createElement('div');
+        unkCard.className = 'result-card full-width';
+        let unkHtml = '<ul class="unknowns-list">';
+        data.unknowns.forEach(u => { unkHtml += `<li>${escapeHtml(u)}</li>`; });
+        unkHtml += '</ul>';
+        unkCard.innerHTML = `<h3>Unknowns</h3>${unkHtml}`;
+        resultsGrid.appendChild(unkCard);
+      }
+      
+      // Action buttons
+      const downloadBtn = document.createElement('button');
+      downloadBtn.className = 'btn-ghost';
+      downloadBtn.textContent = 'Download Brief as Markdown';
+      downloadBtn.addEventListener('click', () => downloadMarkdown(data));
+      actionButtons.appendChild(downloadBtn);
+      
+      // Copy button handlers
+      document.querySelectorAll('[data-copy]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.dataset.copy;
+          const el = document.getElementById(targetId);
+          if (el) {
+            navigator.clipboard.writeText(el.textContent).then(() => {
+              btn.classList.add('copied');
+              btn.textContent = 'Copied!';
+              setTimeout(() => { btn.classList.remove('copied'); btn.textContent = 'Copy'; }, 2000);
+            });
+          }
+        });
+      });
+    }
+    
+    function getConfidenceClass(confidence) {
+      if (confidence >= 70) return 'high';
+      if (confidence >= 40) return 'med';
+      return 'low';
+    }
+    
+    function downloadMarkdown(data) {
+      let md = `# ${escapeHtml(data.title || 'Contribution Brief')}\n\n`;
+      md += `**Repository:** ${escapeHtml(data.repo || '')}\n\n`;
+      md += `## Problem Summary\n${escapeHtml(data.problem_summary || '')}\n\n`;
+      md += `## Difficulty\n`;
+      md += `- **Level:** ${escapeHtml(data.difficulty?.level || 'Unknown')}\n`;
+      md += `- **Estimated Time:** ${escapeHtml(data.difficulty?.estimated_time || 'Unknown')}\n`;
+      md += `- **Confidence:** ${data.difficulty?.confidence || 0}%\n`;
+      md += `- **Reason:** ${escapeHtml(data.difficulty?.why || '')}\n\n`;
+      
+      if (data.files?.length) {
+        md += `## Files to Open\n`;
+        data.files.forEach(f => {
+          md += `### ${escapeHtml(f.path)} ${f.verified ? '✓' : '✗'}\n`;
+          md += `- **Why relevant:** ${escapeHtml(f.why_relevant || '')}\n`;
+          md += `- **Explanation:** ${escapeHtml(f.plain_explanation || '')}\n`;
+          md += `- **Where to look:** ${escapeHtml(f.where_to_look || '')}\n`;
+          if (f.url) md += `- **GitHub:** ${escapeHtml(f.url)}\n`;
+          md += `\n`;
+        });
+      }
+      
+      if (data.fix_plan?.length) {
+        md += `## Fix Plan\n`;
+        data.fix_plan.forEach((step, i) => {
+          md += `${i+1}. **${escapeHtml(step.step)}**\n   ${escapeHtml(step.detail || '')}\n\n`;
+        });
+      }
+      
+      if (data.test_checklist?.length) {
+        md += `## Test Checklist\n`;
+        data.test_checklist.forEach(item => { md += `- [ ] ${escapeHtml(item)}\n`; });
+        md += `\n`;
+      }
+      
+      if (data.commit_message) {
+        md += `## Commit Message\n\`\`\`\n${escapeHtml(data.commit_message)}\n\`\`\`\n\n`;
+      }
+      
+      if (data.pr_description) {
+        md += `## PR Description\n\`\`\`markdown\n${escapeHtml(data.pr_description)}\n\`\`\`\n\n`;
+      }
+      
+      if (data.maintainer_comment) {
+        md += `## Maintainer Comment\n\`\`\`\n${escapeHtml(data.maintainer_comment)}\n\`\`\`\n\n`;
+      }
+      
+      if (data.unknowns?.length) {
+        md += `## Unknowns\n`;
+        data.unknowns.forEach(u => { md += `- ${escapeHtml(u)}\n`; });
+      }
+      
+      const blob = new Blob([md], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `contributor-compass-${data.repo?.replace('/', '-') || 'brief'}.md`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    
+    // ===== Initialize =====
+    // Focus repo input on load
+    repoInput.focus();
+  </script>
+</body>
+</html>
